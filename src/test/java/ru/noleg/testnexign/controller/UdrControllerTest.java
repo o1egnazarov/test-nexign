@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.noleg.testnexign.dto.Call;
 import ru.noleg.testnexign.dto.UdrRecordDto;
-import ru.noleg.testnexign.exception.NotFoundException;
 import ru.noleg.testnexign.service.UdrService;
 
 import java.util.List;

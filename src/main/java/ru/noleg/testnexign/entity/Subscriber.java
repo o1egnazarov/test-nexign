@@ -21,6 +21,10 @@ public class Subscriber {
         this.msisdn = msisdn;
     }
 
+    public Subscriber(String msisdn) {
+        this.msisdn = msisdn;
+    }
+
     public Long getId() {
         return id;
     }

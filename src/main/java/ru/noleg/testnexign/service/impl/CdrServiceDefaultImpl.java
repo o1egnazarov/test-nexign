@@ -1,5 +1,6 @@
 package ru.noleg.testnexign.service.impl;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.noleg.testnexign.dto.CreateCdrReportRequest;
 import ru.noleg.testnexign.dto.CreateCdrReportResponse;
@@ -23,10 +24,12 @@ import java.util.UUID;
 @Service
 public class CdrServiceDefaultImpl implements CdrService {
 
-    private static final String REPORT_DIR = "report";
+
     private static final String CSV_HEADER = "TYPE_CALL,OUTGOING_NUMBER,INCOMING_NUMBER,START_CALL,END_CALL\n";
     private static final String CSV_SEP = ",";
 
+    @Value("${report.directory}")
+    private String reportDirectory;
     private final CdrRepository cdrRepository;
 
     public CdrServiceDefaultImpl(CdrRepository cdrRepository) {
@@ -53,7 +56,7 @@ public class CdrServiceDefaultImpl implements CdrService {
     }
 
     private Path getPath(String msisdn, UUID id) throws IOException {
-        Path reportDir = Paths.get(REPORT_DIR);
+        Path reportDir = Paths.get(reportDirectory);
         if (!Files.exists(reportDir)) {
             Files.createDirectories(reportDir);
         }
@@ -77,7 +80,6 @@ public class CdrServiceDefaultImpl implements CdrService {
 
             writer.write(CSV_HEADER);
             cdrRecords.forEach(cdrRecord -> {
-
                 try {
 
                     writer.write(this.convertCdrRecordToCsv(cdrRecord));

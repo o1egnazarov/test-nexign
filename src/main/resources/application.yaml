@@ -21,3 +21,8 @@ spring:
 generation:
   count:
     cdr: 100
+
+report:
+  directory: report
+
+

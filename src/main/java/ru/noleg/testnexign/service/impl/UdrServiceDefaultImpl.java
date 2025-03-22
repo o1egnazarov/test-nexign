@@ -91,7 +91,6 @@ public class UdrServiceDefaultImpl implements UdrService {
             }
         }
         return udrMap;
-        test-nexign
     }
 
     private List<CdrRecord> filterCdrByDate(Integer year, Integer month, List<CdrRecord> cdrRecords) {

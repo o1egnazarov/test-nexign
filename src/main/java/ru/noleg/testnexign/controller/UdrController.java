@@ -27,7 +27,7 @@ public class UdrController {
         this.udrService = udrService;
     }
 
-        @GetMapping()
+    @GetMapping()
     public ResponseEntity<List<UdrRecordDto>> getUdrRecords(@RequestParam("year") @Min(2000) @Max(2100) Integer year,
                                                             @RequestParam("month") @Min(1) @Max(12) Integer month) {
         return ResponseEntity
