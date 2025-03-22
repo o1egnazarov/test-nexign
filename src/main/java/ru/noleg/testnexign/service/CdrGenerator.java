@@ -9,10 +9,14 @@ import ru.noleg.testnexign.repository.CdrRepository;
 import ru.noleg.testnexign.repository.SubscriberRepository;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+/**
+ * Класс для генерации CDR-записей и сохранения их в БД.
+ */
 @Component
 public class CdrGenerator implements CommandLineRunner {
 
@@ -30,12 +34,18 @@ public class CdrGenerator implements CommandLineRunner {
         this.random = random;
     }
 
+    /**
+     * Вызывается при запуске приложения.
+     */
     @Override
     public void run(String... args) {
-        this.addSubscribers();
+        this.generateSubscribers();
         this.generateCdr();
     }
 
+    /**
+     * Генерирует CDR-записи за один год и сохраняет в базу данных.
+     */
     public void generateCdr() {
         List<String> numbers = subscriberRepository.findAll()
                 .stream()
@@ -66,19 +76,13 @@ public class CdrGenerator implements CommandLineRunner {
         }
     }
 
-    public void addSubscribers() {
-        List<Subscriber> subscribers = Arrays.asList(
-                new Subscriber("79937898253"),
-                new Subscriber("79931125707"),
-                new Subscriber("78022310055"),
-                new Subscriber("77778889905"),
-                new Subscriber("79215433129"),
-                new Subscriber("79607843242"),
-                new Subscriber("79301110085"),
-                new Subscriber("76542317755"),
-                new Subscriber("78125553113"),
-                new Subscriber("79204188253")
-        );
-        subscriberRepository.saveAll(subscribers);
+    /**
+     * Генерирует абонентов и сохраняет в базу данных.
+     */
+    private void generateSubscribers() {
+        List<Subscriber> subscribers = IntStream.range(0, 10)
+                .mapToObj(i -> new Subscriber("79" + (random.nextInt(900000000) + 100000000)))
+                .collect(Collectors.toList());
+        this.subscriberRepository.saveAll(subscribers);
     }
 }

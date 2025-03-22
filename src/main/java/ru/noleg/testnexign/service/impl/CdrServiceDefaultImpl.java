@@ -20,10 +20,11 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
+/**
+ * Сервис CDR для генерации отчётов по звонкам.
+ */
 @Service
 public class CdrServiceDefaultImpl implements CdrService {
-
 
     private static final String CSV_HEADER = "TYPE_CALL,OUTGOING_NUMBER,INCOMING_NUMBER,START_CALL,END_CALL\n";
     private static final String CSV_SEP = ",";
@@ -36,6 +37,11 @@ public class CdrServiceDefaultImpl implements CdrService {
         this.cdrRepository = cdrRepository;
     }
 
+    /**
+     * Создаёт отчёт CDR и сохраняет его в виде CSV-файла.
+     * @param createRequest Запрос на создание отчёта
+     * @return Ответ с идентификатором отчёта
+     */
     public CreateCdrReportResponse createCdrReport(CreateCdrReportRequest createRequest) {
         try {
 
@@ -54,7 +60,13 @@ public class CdrServiceDefaultImpl implements CdrService {
             throw new ServiceException("Service error on create cdr report.", e);
         }
     }
-
+    /**
+     * Создает путь для сохранения CDR-отчёта.
+     * @param msisdn Номер телефона
+     * @param id Уникальный идентификатор отчёта
+     * @return Путь к файлу отчёта
+     * @throws IOException В случае ошибки создания директории
+     */
     private Path getPath(String msisdn, UUID id) throws IOException {
         Path reportDir = Paths.get(reportDirectory);
         if (!Files.exists(reportDir)) {
@@ -64,7 +76,13 @@ public class CdrServiceDefaultImpl implements CdrService {
         String fileName = msisdn + "_" + id + ".csv";
         return reportDir.resolve(fileName);
     }
-
+    /**
+     * Фильтрует CDR-записи по номеру телефона и временным границам.
+     * @param msisdn Номер телефона
+     * @param startDate Начальная дата
+     * @param endDate Конечная дата
+     * @return Список CDR-записей
+     */
     private List<CdrRecord> getCdrByMsisdn(String msisdn, LocalDateTime startDate, LocalDateTime endDate) {
         return cdrRepository.findAll()
                 .stream()
@@ -74,7 +92,12 @@ public class CdrServiceDefaultImpl implements CdrService {
                         cdrRecord.getInitiator().equals(msisdn))
                 .toList();
     }
-
+    /**
+     * Записывает CDR-записи в CSV-файл.
+     * @param file Файл для записи
+     * @param cdrRecords Список CDR-записей
+     * @throws IOException В случае ошибки записи файла
+     */
     private void writeToCsv(File file, List<CdrRecord> cdrRecords) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
 
@@ -90,7 +113,11 @@ public class CdrServiceDefaultImpl implements CdrService {
             });
         }
     }
-
+    /**
+     * Конвертирует CDR-запись в строку CSV-формата.
+     * @param cdrRecord CDR-запись
+     * @return Строка CSV
+     */
     private String convertCdrRecordToCsv(CdrRecord cdrRecord) {
         return cdrRecord.getTypeCall() + CSV_SEP
                 + cdrRecord.getInitiator() + CSV_SEP

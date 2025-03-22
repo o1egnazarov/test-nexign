@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Сервис UDR для получения информации о звонках абонентов.
+ */
 @Service
 public class UdrServiceDefaultImpl implements UdrService {
 
@@ -27,6 +30,14 @@ public class UdrServiceDefaultImpl implements UdrService {
         this.subscriberRepository = subscriberRepository;
     }
 
+    /**
+     * Получает UDR-запись для конкретного абонента за указанный месяц и год.
+     *
+     * @param msisdn Номер телефона
+     * @param year   Год
+     * @param month  Месяц
+     * @return UDR-запись абонента
+     */
     public UdrRecordDto getUdrBySubscriber(String msisdn, Integer year, Integer month) {
         try {
             if (!this.subscriberRepository.existsByMsisdn(msisdn)) {
@@ -45,6 +56,13 @@ public class UdrServiceDefaultImpl implements UdrService {
         }
     }
 
+    /**
+     * Получает список всех UDR-записей за указанный месяц и год.
+     *
+     * @param year  Год
+     * @param month Месяц
+     * @return Список UDR-записей
+     */
     public List<UdrRecordDto> getUdrRecords(Integer year, Integer month) {
         try {
             List<CdrRecord> cdrRecords = this.cdrRepository.findAll();
@@ -61,6 +79,12 @@ public class UdrServiceDefaultImpl implements UdrService {
         }
     }
 
+    /**
+     * Создаёт map UDR-записей для всех абонентов на основе CDR-записей.
+     *
+     * @param cdrRecords Список CDR-записей
+     * @return Карта с UDR-записями (ключ — msisdn, значение — UDR-запись)
+     */
     private Map<String, UdrRecordDto> getMsisdnUdrRecordDtoMap(List<CdrRecord> cdrRecords) {
         Map<String, UdrRecordDto> udrMap = new HashMap<>();
 
@@ -93,6 +117,14 @@ public class UdrServiceDefaultImpl implements UdrService {
         return udrMap;
     }
 
+    /**
+     * Фильтрует CDR-записи по году и месяцу.
+     *
+     * @param year       Год
+     * @param month      Месяц
+     * @param cdrRecords Список CDR-записей
+     * @return Отфильтрованный список CDR-записей
+     */
     private List<CdrRecord> filterCdrByDate(Integer year, Integer month, List<CdrRecord> cdrRecords) {
         return cdrRecords.stream()
                 .filter(cdrRecord -> cdrRecord.getStartCall().getYear() == year &&
@@ -100,6 +132,13 @@ public class UdrServiceDefaultImpl implements UdrService {
                 .toList();
     }
 
+    /**
+     * Создаёт UDR-запись на основе CDR-записей для конкретного абонента.
+     *
+     * @param msisdn     Номер телефона
+     * @param cdrRecords Список CDR-записей
+     * @return UDR-запись
+     */
     private UdrRecordDto createUdrRecord(String msisdn, List<CdrRecord> cdrRecords) {
         long incomingTotal = cdrRecords.stream()
                 .filter(cdrRecord -> cdrRecord.getTypeCall().equals("02") && cdrRecord.getReceiver().equals(msisdn))
